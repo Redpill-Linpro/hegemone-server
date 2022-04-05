@@ -14,22 +14,23 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 @Entity
 public class DeviceMeasurement extends PanacheEntity {
-    @JsonbProperty("device_id")
+    @JsonbProperty(value = "device_id", nillable = true)
     public String deviceId;
 
-    @JsonbProperty("light_measurement")
+    @JsonbProperty(value = "light_measurement", nillable = true)
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     public LightMeasurement lightMeasurement;
 
-    @JsonbProperty("soil_temp")
+    @JsonbProperty(value = "soil_temp", nillable = true)
     public double soilTemp;
 
-    @JsonbProperty("ambient_temp")
+    @JsonbProperty(value = "ambient_temp", nillable = true)
     public double ambientTemp;
 
-    @JsonbProperty("moisture_level")
+    @JsonbProperty(value = "moisture_level", nillable = true)
     public int moistureLevel;
 
     @CreationTimestamp
-    public LocalDateTime date;
+    @JsonbProperty(value = "date_time")
+    public LocalDateTime dateTime;
 }
