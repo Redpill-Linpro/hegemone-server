@@ -26,7 +26,7 @@ public class DeviceMeasurementsResource {
     @GET
     public List<DeviceMeasurement> list(@QueryParam("device_id") String deviceIdParam) {
         if(deviceIdParam != null) {
-            Log.debug("Fetching DeviceMeasurements with deviceId: " + deviceIdParam);
+            Log.debug("Fetching DeviceMeasurements for device " + deviceIdParam);
             return DeviceMeasurement.list("deviceId", deviceIdParam);
         }
         Log.debug("Fetching all DeviceMeasurements");
@@ -36,15 +36,16 @@ public class DeviceMeasurementsResource {
     @GET
     @Path("/{id}")
     public DeviceMeasurement get(@PathParam("id") Long id) {
-        Log.debug("Fetching DeviceMeasurement with id: " + id);
+        Log.debug("Fetching DeviceMeasurement with ID: " + id);
         return DeviceMeasurement.findById(id);
     }
 
     @POST
     @Transactional
     public Response create(DeviceMeasurement deviceMeasurement) {
-        Log.debug("Creating new DeviceMeasurement");
+        Log.debug("Creating new DeviceMeasurement for device " + deviceMeasurement.deviceId);
         deviceMeasurement.persist();
+        Log.debug("Created DeviceMeasurement for device " + deviceMeasurement.deviceId + " with ID: " + deviceMeasurement.id);
         return Response.created(URI.create("/device-measurements/" + deviceMeasurement.id)).build();
     }
 
