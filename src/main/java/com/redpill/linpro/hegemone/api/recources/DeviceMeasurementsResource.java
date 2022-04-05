@@ -52,4 +52,10 @@ public class DeviceMeasurementsResource {
         return Response.created(URI.create("/device-measurements/" + deviceMeasurement.id)).build();
     }
 
+    @GET
+    @Path("/health")
+    public String health() {
+        return "I'M ALIVE!";
+    }
+
 }
