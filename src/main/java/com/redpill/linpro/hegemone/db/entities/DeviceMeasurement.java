@@ -1,10 +1,14 @@
 package com.redpill.linpro.hegemone.db.entities;
 
+import java.time.LocalDateTime;
+
 import javax.json.bind.annotation.JsonbProperty;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
@@ -25,4 +29,7 @@ public class DeviceMeasurement extends PanacheEntity {
 
     @JsonbProperty("moisture_level")
     public int moistureLevel;
+
+    @CreationTimestamp
+    public LocalDateTime date;
 }
