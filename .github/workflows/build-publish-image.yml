@@ -1,12 +1,17 @@
-name: Create and publish a Docker image
+name: Build and publish image
 
 on:
   push:
     tags: ["*"]
 
+env:
+  IMAGE_NAME: redpill-linpro/hegemone-server
+  REGISTRY_NAME: ghcr.io
+
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
@@ -29,44 +34,44 @@ jobs:
         id: build-arm64-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ github.repository }}
-          tags: ${{ github.ref }}
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.event.release.tag_name }}
           archs: arm64
           containerfiles: |
             ./Containerfile.arm64
 
-      - name: Push to ghcr.io
-        id: push-arm64-to-ghcr
+      - name: Push arm64 image to registry
+        id: push-arm64-to-registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-arm64-image.outputs.image }}
           tags: ${{ steps.build-arm64-image.outputs.tags }}
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY_NAME }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print image url
-        run: echo "Image pushed to ${{ steps.push-arm64-to-ghcr.outputs.registry-paths }}"
+      - name: Print arm64 image url
+        run: echo "Image pushed to ${{ steps.push-arm64-to-registry.outputs.registry-paths }}"
 
       - name: Build amd64 image
         id: build-amd64-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ github.repository }}
-          tags: ${{ github.ref }}
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.event.release.tag_name }}
           archs: amd64
           containerfiles: |
             ./Containerfile.amd64
 
-      - name: Push to ghcr.io
-        id: push-amd64-to-ghcr
+      - name: Push amd64 image to registry
+        id: push-amd64-to-registry
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-amd64-image.outputs.image }}
           tags: ${{ steps.build-amd64-image.outputs.tags }}
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY_NAME }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print image url
-        run: echo "Image pushed to ${{ steps.push-amd64-to-ghcr.outputs.registry-paths }}"
+      - name: Print amd64 image url
+        run: echo "Image pushed to ${{ steps.push-amd64-to-registry.outputs.registry-paths }}"
