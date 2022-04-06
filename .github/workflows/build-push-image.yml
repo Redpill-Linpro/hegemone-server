@@ -1,12 +1,14 @@
-name: Build and publish image
+name: Build and push image
 
 on:
   push:
     tags: ["*"]
 
 env:
-  IMAGE_NAME: redpill-linpro/hegemone-server
-  REGISTRY_NAME: ghcr.io
+  IMAGE_NAME: hegemone-server
+  IMAGE_TAGS: ${{ github.ref_name }}
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: redpill-linpro
 
 jobs:
   build-and-push-image:
@@ -19,6 +21,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Install qemu dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
 
       - name: Setup java
         uses: actions/setup-java@v2
@@ -35,7 +42,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: latest ${{ github.event.release.tag_name }}
+          tags: ${{ env.IMAGE_TAGS }}-arm64
           archs: arm64
           containerfiles: |
             ./Containerfile.arm64
@@ -46,19 +53,19 @@ jobs:
         with:
           image: ${{ steps.build-arm64-image.outputs.image }}
           tags: ${{ steps.build-arm64-image.outputs.tags }}
-          registry: ${{ env.REGISTRY_NAME }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print arm64 image url
+      - name: Print image url
         run: echo "Image pushed to ${{ steps.push-arm64-to-registry.outputs.registry-paths }}"
-
+      
       - name: Build amd64 image
         id: build-amd64-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: latest ${{ github.event.release.tag_name }}
+          tags: ${{ env.IMAGE_TAGS }}-amd64
           archs: amd64
           containerfiles: |
             ./Containerfile.amd64
@@ -69,9 +76,9 @@ jobs:
         with:
           image: ${{ steps.build-amd64-image.outputs.image }}
           tags: ${{ steps.build-amd64-image.outputs.tags }}
-          registry: ${{ env.REGISTRY_NAME }}
+          registry: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAMESPACE }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Print amd64 image url
+      - name: Print image url
         run: echo "Image pushed to ${{ steps.push-amd64-to-registry.outputs.registry-paths }}"
