@@ -1,4 +1,4 @@
-FROM arm64v8/openjdk:17.0.2
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.11
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
