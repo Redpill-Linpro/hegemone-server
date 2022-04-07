@@ -29,6 +29,8 @@ public class DeviceMeasurement extends PanacheEntity {
 
     @JsonbProperty(value = "moisture_level", nillable = true)
     public int moistureLevel;
+    @JsonbProperty(value = "spectral_data", nillable = true)
+    public int[] spectralData;
 
     @CreationTimestamp
     @JsonbProperty(value = "date_time")
